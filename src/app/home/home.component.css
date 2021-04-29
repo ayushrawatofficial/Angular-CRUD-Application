@@ -1,0 +1,10 @@
+.box {
+    width: 92%;
+    padding: 10px;
+    border: 1px solid gray;
+    margin-left: 4%;
+  }
+
+input.ng-invalid.ng-touched {
+    border: 1px solid red;
+  }

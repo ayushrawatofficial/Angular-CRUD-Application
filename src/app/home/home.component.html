@@ -1,0 +1,194 @@
+<div *ngIf="isVisible">
+    <div class="alert alert-success" role="alert" *ngIf="isSuccess">
+        {{alertText}}
+    </div>
+    <div class="alert alert-danger" role="alert" *ngIf="!isSuccess">
+        {{alertText}}
+    </div>
+
+</div>
+
+<div class="box">
+    <div>
+        <div>
+            <div>
+                <h3>Add Record</h3>
+            </div>
+
+            <form [formGroup]="addRecordForm" (ngSubmit)="addData();addRecordForm.reset()">
+                <div class="d-flex justify-content-evenly flex-lg-row flex-column ">
+                    <div class="col-lg-3">
+                        <label for="userId">User Id</label>
+                        <div>
+                            <input type="text" class="form-control" id="userId" placeholder="Enter User Id"
+                                formControlName="userId"
+                                [ngClass]="{ 'is-invalid': addRecordForm.get('userId').touched && addRecordForm.get('userId').invalid }" />
+                            <div class="invalid-feedback">
+                                <div *ngIf="addRecordForm.get('userId').errors?.required">User Id is required</div>
+                                <div *ngIf="addRecordForm.get('userId').errors?.pattern">User Id must be number</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="title">Title</label>
+                        <div>
+                            <input type="text" class="form-control" id="title" placeholder="Enter Title"
+                                formControlName="title"
+                                [ngClass]="{ 'is-invalid': addRecordForm.get('title').touched && addRecordForm.get('title').invalid }" />
+                            <div class="invalid-feedback">
+                                <div>Title is required</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="body">Body</label>
+                        <div>
+                            <input type="text" class="form-control" id="body" placeholder="Enter Body"
+                                formControlName="body"
+                                [ngClass]="{ 'is-invalid': addRecordForm.get('body').touched && addRecordForm.get('body').invalid }" />
+                            <div class="invalid-feedback">
+                                <div>Body is required</div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-1">
+                        <br>
+                        <button type="submit" class="btn btn-primary" [disabled]="addRecordForm.invalid">Add</button>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+<div class="box">
+    <h3>Records</h3>
+    <table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="row-border hover table-responsive">
+        <thead>
+            <tr class="d-flex">
+                <th class="col-1">User ID</th>
+                <th class="col-1">ID</th>
+                <th class="col-2">Title</th>
+                <th class="col-3">Body</th>
+                <th class="col-1"></th>
+                <th class="col-1"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let data of dataList" class="d-flex">
+                <td class="col-1">{{ data.id }}</td>
+                <td class="col-1">{{ data.userId }}</td>
+                <td class="col-2">{{ data.title }}</td>
+                <td class="col-4">{{ data.body }}</td>
+                <td class="col-1"><button type="button" class="btn btn-primary " data-toggle='modal'
+                        data-target='#updateModal' (click)="updateData(data)">Update</button></td>
+                <td class="col-1"><button type="button" class="btn btn-danger" data-toggle='modal'
+                        data-target='#deleteModal' (click)="deleteData(data)">Delete</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- update Modal  -->
+<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLabel">Update for ID: {{duplicateData.id}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="formGroup" #updateFrom="ngForm">
+                    <div>
+                        <label for="staticUserId" class="col-form-label">User Id</label>
+                        <div>
+                            <input type="number" class="form-control" placeholder="Enter User Id" name="userId"
+                                [(ngModel)]="duplicateData.userId" #userId="ngModel" required>
+                            <div *ngIf="!userId.valid && userId.touched">User Id required</div>
+
+                        </div>
+                    </div>
+                    <div>
+                        <label for="staticTitle" class="col-form-label">Title</label>
+                        <div>
+                            <input type="text" class="form-control" placeholder="Enter Title" name="title" required
+                                [(ngModel)]="duplicateData.title" #title="ngModel" required>
+                            <div *ngIf="!title.valid && userId.touched">Title required</div>
+
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="staticBody" class=" col-form-label">Body</label>
+                        <div>
+                            <input type="text" class="form-control" placeholder="Enter Body" name="body" required
+                                [(ngModel)]="duplicateData.body" #body="ngModel" required>
+                            <div *ngIf="!body.valid && body.touched">Body required</div>
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" (click)="updateFormReset()">Reset</button>
+                <button type="button" class="btn btn-success" data-dismiss="modal"
+                    (click)="confirmUpdateData(duplicateData)">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Delete Modal  -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Are you sure to delete?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table>
+                    <tr>
+                        <td><b>Id</b></td>
+                        <td>:</td>
+                        <td>{{record.id}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>UserID</b></td>
+                        <td>:</td>
+                        <td>{{record.userId}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Title</b></td>
+                        <td>:</td>
+                        <td>{{record.title}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Body</b></td>
+                        <td>:</td>
+                        <td>{{record.body}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"
+                    (click)="confirmDeleteData(record.id)">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
